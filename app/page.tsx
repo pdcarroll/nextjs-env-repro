@@ -1,7 +1,11 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+import Image from "next/image";
+import { Suspense } from "react";
+import styles from "./page.module.css";
 
-export default function Home() {
+export default function Home({ searchParams }) {
+  // switching to dynamic rendering by reading search params
+  // if the next line is commented out, the env variables become defined in Docker container
+  const someParam = searchParams.someParam;
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -15,7 +19,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            By{' '}
+            By{" "}
             <Image
               src="/vercel.svg"
               alt="Vercel Logo"
@@ -29,14 +33,9 @@ export default function Home() {
       </div>
 
       <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+        <Suspense>
+          <Data />
+        </Suspense>
       </div>
 
       <div className={styles.grid}>
@@ -91,5 +90,10 @@ export default function Home() {
         </a>
       </div>
     </main>
-  )
+  );
+}
+
+async function Data() {
+  // This outputs the correct value when running in dev or prod mode locally (on macOS), but is undefined when running in Docker container
+  return <strong>{process.env.NEXTJS_ENV_REPRO}</strong>;
 }
